@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0e0a0a00;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #0c0a0e04;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .task-list {
+            margin-top: 20px;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        .input-container input {
+            padding: 8px;
+            width: 70%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .input-container button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #9d29c8;
+            color: #eeecec;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background-color: #9d29c8;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .delete {
+            float: right;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .undo {
+            float: right;
+            background-color: #ffe607;
+            color: #333;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TASK MANAGER</h1>
+        <div class="input-container">
+            <input type="text" id="taskInput" placeholder="Add a new task">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <div id="pendingTasks" class="task-list">
+            <h2>Pending Tasks</h2>
+            <ul id="pendingList">
+                <!-- Pending tasks will be added here -->
+            </ul>
+        </div>
+        <div id="completedTasks" class="task-list">
+            <h2>Completed Tasks</h2>
+            <ul id="completedList">
+                <!-- Completed tasks will be added here -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function addTask() {
+            var taskInput = document.getElementById("taskInput");
+            var taskText = taskInput.value.trim();
+            if (taskText !== "") {
+                var li = document.createElement("li");
+                li.textContent = taskText;
+                li.addEventListener("click", toggleComplete);
+                
+                var deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.classList.add("delete");
+                deleteButton.addEventListener("click", deleteTask);
+                li.appendChild(deleteButton);
+                
+                document.getElementById("pendingList").appendChild(li);
+                taskInput.value = "";
+            }
+        }
+
+        function toggleComplete() {
+            this.classList.toggle("completed");
+            var parentList = this.parentElement.id;
+            var targetList = parentList === "pendingList" ? "completedList" : "pendingList";
+            document.getElementById(targetList).appendChild(this);
+            
+            var undoButton = document.createElement("button");
+            undoButton.textContent = "Undo";
+            undoButton.classList.add("undo");
+            undoButton.addEventListener("click", undoTask);
+            this.appendChild(undoButton);
+            
+            this.querySelector('.delete').remove(); // Remove delete button
+            this.removeEventListener("click", toggleComplete); // Remove click listener
+        }
+        
+        function deleteTask() {
+            this.parentElement.remove();
+        }
+        
+        function undoTask() {
+            this.parentElement.classList.remove("completed");
+            var parentList = this.parentElement.parentElement.id;
+            var targetList = parentList === "pendingList" ? "completedList" : "pendingList";
+            document.getElementById(targetList).appendChild(this.parentElement);
+            var deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.classList.add("delete");
+            deleteButton.addEventListener("click", deleteTask);
+            this.parentElement.appendChild(deleteButton);
+            this.remove();
+        }
+    </script>
+</body>
+</html>
